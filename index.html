@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SALUDOMI IPS | Salud Domiciliaria</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  :root {
+    --azul: #1A6BAF;
+    --azul-claro: #4BA3D9;
+    --azul-oscuro: #0D3F6E;
+    --azul-palido: #E6F2FB;
+    --acento: #29C5F6;
+    --blanco: #F8FBFF;
+    --gris: #5A6A7A;
+    --gris-claro: #EEF4FA;
+    --negro: #0D1B2A;
+  }
+  
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'DM Sans',sans-serif; background:var(--blanco); color:var(--negro); overflow-x:hidden; }
+
+  /* ─── NAVBAR ─── */
+  nav {
+    position:fixed; top:0; width:100%; z-index:1000;
+    background:rgba(248,251,255,0.95); backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(26,107,175,0.12);
+    padding:0 5%; display:flex; align-items:center; justify-content:space-between;
+    height:72px; transition:box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow:0 4px 30px rgba(26,107,175,0.12); }
+  .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+  .nav-logo img { width:46px; height:46px; object-fit:contain; border-radius:10px; background:transparent; padding:3px; }
+  .nav-logo-text { display:flex; flex-direction:column; }
+  .nav-logo-text .nombre { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:var(--azul-oscuro); line-height:1; }
+  .nav-logo-text .subtitulo { font-size:0.68rem; font-weight:600; color:var(--azul-claro); letter-spacing:0.08em; text-transform:uppercase; }
+  .nav-links { display:flex; gap:1.8rem; list-style:none; align-items:center; }
+  .nav-links a { text-decoration:none; color:var(--negro); font-size:0.9rem; font-weight:500; transition:color 0.2s; position:relative; }
+  .nav-links a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--azul-claro); transition:width 0.3s; }
+  .nav-links a:hover { color:var(--azul); }
+  .nav-links a:hover::after { width:100%; }
+  .nav-cta { background:var(--azul) !important; color:white !important; padding:10px 22px !important; border-radius:50px; font-weight:600 !important; transition:background 0.2s,transform 0.2s !important; }
+  .nav-cta:hover { background:var(--azul-oscuro) !important; transform:translateY(-1px); }
+  .nav-cta::after { display:none !important; }
+  .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+  .hamburger span { width:26px; height:2px; background:var(--negro); border-radius:2px; transition:0.3s; }
+
+  /* ─── HERO ─── */
+  #inicio {
+    min-height:100vh;
+    background:linear-gradient(135deg,#0D3F6E 0%,#1A6BAF 55%,#0a2a4a 100%);
+    position:relative; overflow:hidden;
+    display:flex; align-items:center;
+    padding:110px 5% 80px;
+  }
+  #inicio::before {
+    content:''; position:absolute; top:-15%; right:-8%;
+    width:650px; height:650px;
+    background:radial-gradient(circle,rgba(75,163,217,0.2) 0%,transparent 70%);
+    border-radius:50%; animation:pulseGlow 7s ease-in-out infinite;
+  }
+  #inicio::after {
+    content:''; position:absolute; bottom:-25%; left:-5%;
+    width:450px; height:450px;
+    background:radial-gradient(circle,rgba(41,197,246,0.1) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  @keyframes pulseGlow { 0%,100%{transform:scale(1);opacity:0.5} 50%{transform:scale(1.08);opacity:1} }
+
+  .hero-inner {
+    max-width:800px; margin:0 auto; width:100%;
+    position:relative; z-index:1; text-align:center;
+  }
+  .hero-logo-wrap {
+    display:flex; justify-content:center; margin-bottom:2rem;
+    animation:fadeInDown 0.8s ease both;
+  }
+  .hero-logo-wrap img {
+    width:110px; height:110px; object-fit:contain;
+    background:transparent; border-radius:24px; padding:8px;
+    box-shadow:0 0 40px rgba(41,197,246,0.3);
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(41,197,246,0.15); border:1px solid rgba(41,197,246,0.4);
+    padding:6px 18px; border-radius:50px; color:var(--acento);
+    font-size:0.82rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+    margin-bottom:1.5rem; animation:fadeInDown 0.9s ease both 0.1s;
+  }
+  .hero-badge::before { content:'●'; font-size:0.5rem; animation:blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero-title {
+    font-family:'Playfair Display',serif;
+    font-size:clamp(2.2rem,4.5vw,4rem);
+    font-weight:700; color:white; line-height:1.15;
+    margin-bottom:1.5rem; animation:fadeInUp 0.9s ease both 0.2s;
+  }
+  .hero-title .highlight {
+    color:var(--acento); position:relative;
+  }
+  .hero-title .highlight::after {
+    content:''; position:absolute; bottom:2px; left:0;
+    width:100%; height:3px; background:var(--acento); opacity:0.4; border-radius:2px;
+  }
+  .hero-desc {
+    color:rgba(255,255,255,0.78); font-size:1.05rem;
+    line-height:1.8; margin-bottom:2.5rem;
+    max-width:620px; margin-left:auto; margin-right:auto;
+    animation:fadeInUp 0.9s ease both 0.3s;
+  }
+  .hero-btns {
+    display:flex; gap:1rem; flex-wrap:wrap;
+    justify-content:center; animation:fadeInUp 0.9s ease both 0.4s;
+  }
+  .btn-primary {
+    background:var(--acento); color:var(--negro);
+    padding:15px 34px; border-radius:50px;
+    font-weight:700; font-size:0.95rem; text-decoration:none;
+    border:none; cursor:pointer;
+    transition:transform 0.2s,box-shadow 0.2s;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(41,197,246,0.45); }
+  .btn-outline {
+    background:transparent; color:white;
+    padding:15px 34px; border-radius:50px;
+    font-weight:600; font-size:0.95rem; text-decoration:none;
+    border:2px solid rgba(255,255,255,0.4); cursor:pointer; transition:all 0.2s;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-outline:hover { background:rgba(255,255,255,0.1); border-color:white; }
+
+  @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeInUp   { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn     { from{opacity:0} to{opacity:1} }
+
+  /* ─── SECCIÓN BASE ─── */
+  section { padding:100px 5%; }
+  .section-label { text-transform:uppercase; letter-spacing:0.1em; font-size:0.78rem; font-weight:700; color:var(--azul-claro); margin-bottom:0.75rem; display:block; }
+  .section-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,3vw,2.8rem); font-weight:700; line-height:1.2; color:var(--negro); margin-bottom:1rem; }
+  .section-desc { color:var(--gris); font-size:1rem; line-height:1.78; max-width:560px; }
+  .section-head { margin-bottom:4rem; }
+  .max-w { max-width:1200px; margin:0 auto; }
+
+  /* ─── SERVICIOS ─── */
+  #servicios { background:var(--gris-claro); }
+  .servicios-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+  .servicio-card {
+    background:white; border-radius:20px; padding:2rem;
+    border:1px solid rgba(26,107,175,0.08);
+    transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  }
+  .servicio-card:hover { transform:translateY(-6px); box-shadow:0 20px 50px rgba(26,107,175,0.12); border-color:var(--azul-claro); }
+  .serv-icon {
+    width:56px; height:56px; border-radius:16px; background:var(--azul-palido);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; margin-bottom:1.25rem; transition:background 0.3s;
+  }
+  .servicio-card:hover .serv-icon { background:var(--azul); }
+  .servicio-card h3 { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:600; color:var(--negro); margin-bottom:0.6rem; }
+  .servicio-card p { color:var(--gris); font-size:0.88rem; line-height:1.65; }
+  .serv-tag { display:inline-block; margin-top:1rem; background:var(--azul-palido); color:var(--azul); font-size:0.72rem; font-weight:700; padding:4px 12px; border-radius:50px; }
+
+  /* ─── NOSOTROS ─── */
+  #nosotros { background:white; }
+  .nosotros-grid { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; }
+  .nosotros-img-wrap {
+    background:linear-gradient(135deg,var(--azul-palido),rgba(26,107,175,0.1));
+    border-radius:24px; padding:3.5rem;
+    display:flex; align-items:center; justify-content:center;
+    min-height:400px; position:relative; overflow:hidden;
+  }
+  .nosotros-img-wrap::before {
+    content:''; position:absolute; top:-20%; right:-20%;
+    width:400px; height:300px;
+    background:radial-gradient(circle,rgba(26,107,175,0.12) 0%,transparent 70%);
+    border-radius:50%;
+  }
+  .nosotros-logo-big {
+    width:500px; height:400px; object-fit:contain;
+    background:transparent; border-radius:28px; padding:12px;
+    box-shadow:0 16px 50px rgba(26,107,175,0.2);
+    animation:pulseGlow 4s ease-in-out infinite;
+  }
+  .values-list { margin-top:2.5rem; display:flex; flex-direction:column; gap:1rem; }
+  .value-item {
+    display:flex; align-items:flex-start; gap:1rem; padding:1.2rem; border-radius:14px;
+    background:var(--gris-claro); border-left:3px solid var(--azul-claro); transition:background 0.2s;
+  }
+  .value-item:hover { background:var(--azul-palido); }
+  .value-item .vi { font-size:1.4rem; }
+  .value-item h4 { font-weight:700; font-size:0.95rem; color:var(--negro); margin-bottom:3px; }
+  .value-item p { color:var(--gris); font-size:0.84rem; line-height:1.55; }
+
+  /* ─── PROCESO ─── */
+  #proceso { background:var(--negro); }
+  #proceso .section-label { color:var(--acento); }
+  #proceso .section-title { color:white; }
+  #proceso .section-desc { color:rgba(255,255,255,0.6); }
+  .proceso-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; position:relative; }
+  .proceso-steps::before {
+    content:''; position:absolute; top:28px; left:12%; right:12%; height:2px;
+    background:linear-gradient(90deg,var(--azul),var(--azul-claro),var(--acento)); z-index:0;
+  }
+  .step-card {
+    background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+    border-radius:20px; padding:2rem 1.5rem; text-align:center; position:relative; z-index:1;
+    transition:background 0.3s,border-color 0.3s;
+  }
+  .step-card:hover { background:rgba(26,107,175,0.2); border-color:var(--azul-claro); }
+  .step-num {
+    width:56px; height:56px; border-radius:50%; background:var(--azul); color:white;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1.1rem; margin:0 auto 1.5rem;
+    border:4px solid var(--negro); font-family:'Playfair Display',serif;
+  }
+  .step-icon { font-size:1.8rem; margin-bottom:1rem; }
+  .step-card h3 { color:white; font-weight:600; font-size:1rem; margin-bottom:0.6rem; }
+  .step-card p { color:rgba(255,255,255,0.55); font-size:0.84rem; line-height:1.6; }
+
+  /* ─── TRABAJA CON NOSOTROS ─── */
+  #trabaja { background:var(--gris-claro); }
+  .beneficios-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.25rem; margin-bottom:4rem; }
+  .beneficio-card {
+    background:white; border-radius:18px; padding:1.75rem 1.5rem;
+    border:1px solid rgba(26,107,175,0.08); text-align:center;
+    transition:transform 0.3s,box-shadow 0.3s,border-color 0.3s;
+  }
+  .beneficio-card:hover { transform:translateY(-5px); box-shadow:0 16px 40px rgba(26,107,175,0.1); border-color:var(--azul-claro); }
+  .ben-icon {
+    font-size:1.8rem; width:58px; height:58px; background:var(--azul-palido);
+    border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem;
+  }
+  .beneficio-card h4 { font-weight:700; font-size:0.97rem; color:var(--negro); margin-bottom:0.5rem; }
+  .beneficio-card p { color:var(--gris); font-size:0.82rem; line-height:1.6; }
+
+  .trabaja-grid { display:grid; grid-template-columns:1fr 1.1fr; gap:3rem; align-items:start; }
+  .vacantes-col > h3 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--negro); margin-bottom:1.5rem; }
+  .vacante-item {
+    background:white; border-radius:16px; padding:1.25rem 1.5rem;
+    border:1.5px solid rgba(26,107,175,0.1); margin-bottom:1rem;
+    transition:border-color 0.2s,box-shadow 0.2s;
+  }
+  .vacante-item:hover { border-color:var(--azul-claro); box-shadow:0 8px 24px rgba(26,107,175,0.08); }
+  .vacante-item.activa { border-color:var(--azul-claro); background:var(--azul-palido); }
+  .vac-top { display:flex; align-items:center; gap:12px; margin-bottom:0.6rem; }
+  .vac-icon { font-size:1.4rem; width:42px; height:42px; border-radius:10px; background:var(--azul-palido); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .vacante-item.activa .vac-icon { background:rgba(26,107,175,0.15); }
+  .vac-top h4 { font-weight:700; font-size:0.95rem; color:var(--negro); margin-bottom:2px; }
+  .vac-tipo { font-size:0.75rem; color:var(--azul); font-weight:600; }
+  .vacante-item > p { color:var(--gris); font-size:0.82rem; line-height:1.55; margin-bottom:0.75rem; }
+  .vac-tags { display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .vac-tags span { background:var(--azul-palido); color:var(--azul); font-size:0.7rem; font-weight:600; padding:3px 10px; border-radius:50px; }
+
+  /* ─── FORMULARIOS ─── */
+  .form-card { background:white; border-radius:24px; padding:2.5rem; border:1px solid rgba(26,107,175,0.1); box-shadow:0 10px 40px rgba(26,107,175,0.06); }
+  .form-card h3 { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; margin-bottom:1.5rem; color:var(--negro); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-group { margin-bottom:1.2rem; }
+  .form-group label { display:block; font-size:0.82rem; font-weight:600; color:var(--negro); margin-bottom:6px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width:100%; padding:12px 16px; border:1.5px solid rgba(26,107,175,0.15);
+    border-radius:12px; font-family:'DM Sans',sans-serif; font-size:0.9rem;
+    color:var(--negro); background:var(--blanco);
+    transition:border-color 0.2s,box-shadow 0.2s; outline:none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color:var(--azul-claro); box-shadow:0 0 0 4px rgba(75,163,217,0.12); }
+  .form-group textarea { resize:vertical; min-height:110px; }
+  .file-drop {
+    border:2px dashed rgba(26,107,175,0.25); border-radius:12px; padding:1.25rem;
+    text-align:center; cursor:pointer; transition:border-color 0.2s,background 0.2s;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    color:var(--gris); font-size:0.85rem;
+  }
+  .file-drop:hover { border-color:var(--azul-claro); background:var(--azul-palido); }
+  .file-icon { font-size:1.4rem; }
+  .btn-submit {
+    width:100%; padding:15px; background:var(--azul); color:white;
+    border:none; border-radius:50px; font-family:'DM Sans',sans-serif;
+    font-size:1rem; font-weight:700; cursor:pointer;
+    transition:background 0.2s,transform 0.2s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn-submit:hover { background:var(--azul-oscuro); transform:translateY(-1px); }
+
+  /* ─── COBERTURA ─── */
+  #cobertura { background:linear-gradient(135deg,var(--azul-oscuro),var(--azul)); color:white; text-align:center; }
+  #cobertura .section-label { color:rgba(255,255,255,0.65); }
+  #cobertura .section-title { color:white; }
+  #cobertura .section-desc { color:rgba(255,255,255,0.72); margin:0 auto; }
+  .cobertura-grid { display:flex; justify-content:center; gap:1.25rem; flex-wrap:wrap; margin-top:3rem; }
+  .zona-chip {
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+    border-radius:50px; padding:10px 22px; color:white; font-size:0.9rem; font-weight:500;
+    display:flex; align-items:center; gap:6px; transition:background 0.2s;
+  }
+  .zona-chip:hover { background:rgba(255,255,255,0.22); }
+
+  /* ─── CONTACTO ─── */
+  #contacto { background:var(--gris-claro); }
+  .contacto-grid { display:grid; grid-template-columns:1fr 1.3fr; gap:4rem; align-items:start; }
+  .contact-info h3 { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:700; color:var(--negro); margin-bottom:1rem; }
+  .contact-info > p { color:var(--gris); line-height:1.75; margin-bottom:2rem; }
+  .contact-items { display:flex; flex-direction:column; gap:1rem; }
+  .contact-item { display:flex; align-items:center; gap:1rem; background:white; border-radius:14px; padding:1rem 1.25rem; border:1px solid rgba(26,107,175,0.1); }
+  .ci-icon { width:44px; height:44px; border-radius:12px; background:var(--azul-palido); display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+  .contact-item p { font-size:0.78rem; color:var(--gris); margin:0; }
+  .contact-item strong { font-size:0.92rem; color:var(--negro); display:block; }
+
+  /* ─── FOOTER ─── */
+  footer { background:var(--negro); color:rgba(255,255,255,0.65); padding:5rem 5% 2rem; }
+  .footer-grid { display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; gap:3rem; margin-bottom:3rem; }
+  .footer-brand p { font-size:0.87rem; line-height:1.75; margin:1rem 0 1.5rem; }
+  .footer-logo-wrap { display:flex; align-items:center; gap:12px; margin-bottom:0.75rem; }
+  .footer-logo-wrap img { width:44px; height:44px; object-fit:contain; background:transparent; border-radius:10px; padding:3px; }
+  .footer-logo-wrap .nombre { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:white; }
+  .footer-logo-wrap .sub { font-size:0.65rem; color:var(--azul-claro); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; }
+  .social-links { display:flex; gap:0.75rem; }
+  .social-links a { width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; color:white; text-decoration:none; font-size:0.85rem; font-weight:700; transition:background 0.2s; }
+  .social-links a:hover { background:var(--azul); }
+  .footer-col h4 { color:white; font-weight:700; font-size:0.95rem; margin-bottom:1.25rem; }
+  .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:0.65rem; }
+  .footer-col ul a { color:rgba(255,255,255,0.6); text-decoration:none; font-size:0.87rem; transition:color 0.2s; }
+  .footer-col ul a:hover { color:var(--azul-claro); }
+  .footer-bottom { border-top:1px solid rgba(255,255,255,0.08); padding-top:2rem; display:flex; justify-content:space-between; align-items:center; font-size:0.82rem; }
+  .certifications { display:flex; gap:0.75rem; }
+  .cert-badge { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:8px; padding:5px 12px; font-size:0.72rem; color:rgba(255,255,255,0.55); display:flex; align-items:center; gap:5px; }
+
+  /* ─── WHATSAPP FAB ─── */
+  .whatsapp-fab { position:fixed; bottom:2rem; right:2rem; width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:1.7rem; text-decoration:none; box-shadow:0 6px 30px rgba(37,211,102,0.4); z-index:999; animation:wapulse 2s infinite; transition:transform 0.2s; }
+  .whatsapp-fab:hover { transform:scale(1.1); }
+  @keyframes wapulse { 0%,100%{box-shadow:0 6px 30px rgba(37,211,102,0.4)} 50%{box-shadow:0 6px 42px rgba(37,211,102,0.7)} }
+
+  /* ─── REVEAL ─── */
+  .reveal { opacity:0; transform:translateY(28px); transition:opacity 0.7s ease,transform 0.7s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:1024px) {
+    .nosotros-grid,.contacto-grid,.trabaja-grid { grid-template-columns:1fr; }
+    .servicios-grid { grid-template-columns:repeat(2,1fr); }
+    .beneficios-grid { grid-template-columns:repeat(2,1fr); }
+    .proceso-steps { grid-template-columns:repeat(2,1fr); }
+    .proceso-steps::before { display:none; }
+    .footer-grid { grid-template-columns:1fr 1fr; }
+  }
+  @media(max-width:640px) {
+    nav { padding:0 4%; }
+    .nav-links { display:none; }
+    .hamburger { display:flex; }
+    .servicios-grid,.beneficios-grid,.proceso-steps { grid-template-columns:1fr; }
+    .footer-grid { grid-template-columns:1fr; }
+    .footer-bottom { flex-direction:column; gap:1rem; text-align:center; }
+    .hero-btns { flex-direction:column; align-items:center; }
+    .form-row { grid-template-columns:1fr; }
+    section { padding:70px 4%; }
+  }
+</style>
+</head>
+<body>
+
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#inicio" class="nav-logo">
+    <div class="nav-logo-text">
+      <span class="nombre">SALUDOMI IPS</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#proceso">¿Cómo funciona?</a></li>
+    <li><a href="#trabaja">Trabaja con Nosotros</a></li>
+    <li><a href="#contacto" class="nav-cta">Solicitar Servicio</a></li>
+  </ul>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="inicio">
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      Salud de <span class="highlight">Calidad</span> en la comodidad de tu hogar
+    </h1>
+    <p class="hero-desc">
+      Somos SALUDOMI IPS, tu aliado de salud en casa. Llevamos atención médica, enfermería, laboratorio y terapias directamente a tu hogar en Arauca y sus departamentos, con el más alto estándar clínico.
+    </p>
+    <div class="hero-btns">
+      <a href="#contacto" class="btn-primary"><i class="fa-solid fa-clipboard-list"></i> Solicitar Visita Médica</a>
+      <a href="tel:+573106194223" class="btn-outline"><i class="fa-solid fa-phone"></i> Llamar Ahora</a>
+    </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="max-w">
+    <div class="section-head reveal">
+      <span class="section-label">Nuestros Servicios</span>
+      <h2 class="section-title">Todo lo que necesitas,<br>sin salir de casa</h2>
+      <p class="section-desc">Contamos con un equipo multidisciplinario para cubrir todas tus necesidades de salud domiciliaria en Arauca.</p>
+    </div>
+    <div class="servicios-grid">
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-user-doctor"></i></div>
+        <h3>Visita Médica Domiciliaria</h3>
+        <p>Consulta con médicos generales y especialistas en tu hogar. Diagnóstico, prescripción y seguimiento clínico.</p>
+        <span class="serv-tag">General · Especializada</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-syringe"></i></div>
+        <h3>Enfermería Profesional</h3>
+        <p>Curación de heridas, administración de medicamentos IV, manejo de sondas y cuidados post-operatorios.</p>
+        <span class="serv-tag">24/7 disponible</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-vial"></i></div>
+        <h3>Laboratorio a Domicilio</h3>
+        <p>Toma de muestras de sangre, orina y más. Resultados enviados directamente a tu correo o WhatsApp.</p>
+        <span class="serv-tag">Resultados rápidos</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-dumbbell"></i></div>
+        <h3>Fisioterapia y Rehabilitación</h3>
+        <p>Terapia física, ocupacional y respiratoria. Rehabilitación post-cirugía, ACV, ortopédica y neurológica.</p>
+        <span class="serv-tag">Rehabilitación integral</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-pills"></i></div>
+        <h3>Infusión de Medicamentos IV</h3>
+        <p>Administración de antibióticos, quimioterapia, nutrición parenteral y otros tratamientos intravenosos en casa.</p>
+        <span class="serv-tag">Tratamientos especializados</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-brain"></i></div>
+        <h3>Atención Paliativa</h3>
+        <p>Acompañamiento integral para pacientes con enfermedades crónicas o en etapa terminal. Dignidad y confort siempre.</p>
+        <span class="serv-tag">Cuidado humano</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-person-cane"></i></div>
+        <h3>Cuidado del Adulto Mayor</h3>
+        <p>Programa especializado con enfermeros, médicos geriátricos y terapeutas para pacientes mayores en casa.</p>
+        <span class="serv-tag">Geriatría</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-utensils"></i></div>
+        <h3>Nutrición Clínica</h3>
+        <p>Evaluación nutricional, planes personalizados y soporte nutricional para pacientes en hospitalización domiciliaria.</p>
+        <span class="serv-tag">Nutricionistas certificados</span>
+      </div>
+      <div class="servicio-card reveal">
+        <div class="serv-icon"><i class="fa-solid fa-x-ray"></i></div>
+        <h3>Imágenes Diagnósticas</h3>
+        <p>Electrocardiograma, ecografía portátil y otros exámenes de imagen directamente en tu hogar.</p>
+        <span class="serv-tag">Tecnología portátil</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section id="nosotros">
+  <div class="max-w nosotros-grid">
+    <div class="nosotros-visual reveal">
+      <div class="nosotros-img-wrap">
+        <img class="nosotros-logo-big" src="logo.png">
+      </div>
+    </div>
+    <div class="nosotros-text reveal">
+      <span class="section-label">Sobre Nosotros</span>
+      <h2 class="section-title">SALUDOMI IPS, comprometidos con tu salud en Arauca</h2>
+      <p class="section-desc">
+        Somos una institución prestadora de servicios de salud domiciliaria habilitada por el Ministerio de Salud y Protección Social de Colombia. Nuestro compromiso es llevar atención médica de calidad a cada rincón de Arauca y sus departamentos, con profesionales altamente capacitados y tecnología adecuada.
+      </p>
+      <div class="values-list">
+        <div class="value-item">
+          <span class="vi"><i class="fa-solid fa-award"></i></span>
+          <div>
+            <h4>Certificación de Calidad</h4>
+            <p>Cumplimos todos los estándares del SOGCS. Habilitados por el Ministerio de Salud y Protección Social.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <span class="vi"><i class="fa-solid fa-heart-pulse"></i></span>
+          <div>
+            <h4>Humanización del servicio</h4>
+            <p>Tratamos a cada paciente con dignidad, respeto y calidez. El cuidado humano es nuestra razón de ser.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <span class="vi"><i class="fa-solid fa-shield-halved"></i></span>
+          <div>
+            <h4>Seguridad clínica</h4>
+            <p>Protocolos estrictos de bioseguridad, historia clínica electrónica y seguimiento continuo a cada caso.</p>
+          </div>
+        </div>
+        <div class="value-item">
+          <span class="vi"><i class="fa-solid fa-handshake"></i></span>
+          <div>
+            <h4>Convenios con EPS</h4>
+            <p>Trabajamos con las principales aseguradoras. Consúltanos para verificar cobertura con tu EPS.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESO -->
+<section id="proceso">
+  <div class="max-w">
+    <div class="section-head reveal" style="text-align:center;">
+      <span class="section-label">¿Cómo Funciona?</span>
+      <h2 class="section-title">Del contacto a la atención<br>en 4 simples pasos</h2>
+      <p class="section-desc" style="margin:0 auto;color:rgba(255,255,255,0.6);">Todo el proceso es sencillo, rápido y sin filas.</p>
+    </div>
+    <div class="proceso-steps">
+      <div class="step-card reveal">
+        <div class="step-num">1</div>
+        <div class="step-icon"><i class="fa-solid fa-phone"></i></div>
+        <h3>Contacto inicial</h3>
+        <p>Llámanos al <strong style="color:var(--acento)">310 619 4223</strong> o escríbenos por WhatsApp. Disponibles 24/7.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">2</div>
+        <div class="step-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+        <h3>Valoración del caso</h3>
+        <p>Un coordinador evalúa tus necesidades y programa el servicio más adecuado para ti.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">3</div>
+        <div class="step-icon"><i class="fa-solid fa-car"></i></div>
+        <h3>Desplazamiento</h3>
+        <p>El profesional de salud se desplaza hasta tu domicilio con todos los equipos necesarios.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">4</div>
+        <div class="step-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        <h3>Seguimiento digital</h3>
+        <p>Recibes el informe de la atención y seguimiento continuo vía WhatsApp o correo electrónico.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRABAJA CON NOSOTROS -->
+<section id="trabaja">
+  <div class="max-w">
+    <div class="reveal" style="text-align:center;margin-bottom:4rem;">
+      <span class="section-label">Talento Humano</span>
+      <h2 class="section-title">Sé parte de nuestro equipo</h2>
+      <p class="section-desc" style="margin:0 auto;">Buscamos profesionales de la salud apasionados que quieran marcar una diferencia real en la vida de los pacientes de Arauca. Si amas lo que haces, aquí es tu lugar.</p>
+    </div>
+
+    <div class="beneficios-grid reveal">
+      <div class="beneficio-card">
+        <div class="ben-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+        <h4>Salario competitivo</h4>
+        <p>Remuneración acorde al mercado con bonificaciones por desempeño y cumplimiento de metas asistenciales.</p>
+      </div>
+      <div class="beneficio-card">
+        <div class="ben-icon"><i class="fa-solid fa-book-medical"></i></div>
+        <h4>Formación continua</h4>
+        <p>Capacitaciones, cursos y actualizaciones clínicas sin costo para todos nuestros colaboradores.</p>
+      </div>
+      <div class="beneficio-card">
+        <div class="ben-icon"><i class="fa-solid fa-clock"></i></div>
+        <h4>Horarios flexibles</h4>
+        <p>Turnos adaptables a tu vida. Modalidades de tiempo completo, medio tiempo, por horas o fines de semana.</p>
+      </div>
+      <div class="beneficio-card">
+        <div class="ben-icon"><i class="fa-solid fa-seedling"></i></div>
+        <h4>Plan de carrera</h4>
+        <p>Crecimiento real dentro de la organización con oportunidades de ascenso y liderazgo para quienes se destacan.</p>
+      </div>
+    </div>
+
+    <div class="trabaja-grid reveal">
+      <div class="vacantes-col">
+        <h3>Vacantes disponibles</h3>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-user-doctor"></i></span><div><h4>Médico General Domiciliario</h4><span class="vac-tipo">Tiempo completo · Arauca</span></div></div>
+          <p>Atención domiciliaria a pacientes crónicos y agudos. Tarjeta profesional vigente y registro RETHUS requeridos.</p>
+          <div class="vac-tags"><span>Medicina General</span><span>Domiciliario</span><span>RETHUS</span></div>
+        </div>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-syringe"></i></span><div><h4>Enfermero/a Profesional</h4><span class="vac-tipo">Tiempo completo / Turnos · Arauca</span></div></div>
+          <p>Manejo de pacientes domiciliarios, curaciones, canalización, administración IV y cuidados especiales.</p>
+          <div class="vac-tags"><span>Enfermería</span><span>IV Therapy</span><span>Cuidado crónico</span></div>
+        </div>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-dumbbell"></i></span><div><h4>Fisioterapeuta</h4><span class="vac-tipo">Medio tiempo · Arauca</span></div></div>
+          <p>Rehabilitación neurológica, respiratoria y ortopédica en domicilio. Mínimo 1 año de experiencia.</p>
+          <div class="vac-tags"><span>Fisioterapia</span><span>Neurológica</span><span>Respiratoria</span></div>
+        </div>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-flask"></i></span><div><h4>Bacteriólogo/a</h4><span class="vac-tipo">Por servicios · Arauca y área</span></div></div>
+          <p>Toma de muestras a domicilio, flebotomía y manejo adecuado de material biológico. Vehículo propio deseable.</p>
+          <div class="vac-tags"><span>Laboratorio</span><span>Flebotomía</span><span>Independiente</span></div>
+        </div>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-user-nurse"></i></span><div><h4>Auxiliar de Enfermería</h4><span class="vac-tipo">Turnos rotativos · Arauca</span></div></div>
+          <p>Apoyo en cuidados básicos, signos vitales, mantenimiento de vías y acompañamiento a pacientes crónicos.</p>
+          <div class="vac-tags"><span>Auxiliar</span><span>Signos vitales</span><span>Domiciliario</span></div>
+        </div>
+        <div class="vacante-item">
+          <div class="vac-top"><span class="vac-icon"><i class="fa-solid fa-utensils"></i></span><div><h4>Nutricionista Dietista</h4><span class="vac-tipo">Medio tiempo · Arauca</span></div></div>
+          <p>Evaluación y seguimiento nutricional de pacientes con patologías crónicas y oncológicas en domicilio.</p>
+          <div class="vac-tags"><span>Nutrición Clínica</span><span>Oncológica</span><span>Domiciliario</span></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.75rem;">
+          <div style="width:50px;height:50px;background:var(--azul-palido);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;"><i class="fa-solid fa-file-pen"></i></div>
+          <div>
+            <h3 style="margin:0;font-size:1.3rem;">Postúlate aquí</h3>
+            <p style="color:var(--gris);font-size:0.8rem;margin:2px 0 0;">Te contactaremos en menos de 48 horas hábiles</p>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+          <div class="form-group"><label>Apellido</label><input type="text" placeholder="Tu apellido"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Teléfono / WhatsApp</label><input type="tel" placeholder="+57 310 000 0000"></div>
+          <div class="form-group"><label>Correo electrónico</label><input type="email" placeholder="tu@email.com"></div>
+        </div>
+        <div class="form-group">
+          <label>Profesión / Área de salud</label>
+          <select>
+            <option value="">Selecciona tu perfil profesional</option>
+            <option>Médico General</option><option>Médico Especialista</option>
+            <option>Enfermero/a Profesional</option><option>Auxiliar de Enfermería</option>
+            <option>Fisioterapeuta</option><option>Fonoaudiólogo/a</option>
+            <option>Terapeuta Ocupacional</option><option>Bacteriólogo/a</option>
+            <option>Nutricionista Dietista</option><option>Psicólogo/a Clínico</option>
+            <option>Otro perfil de salud</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Disponibilidad</label>
+            <select>
+              <option value="">Tu disponibilidad</option>
+              <option>Tiempo completo</option><option>Medio tiempo (mañanas)</option>
+              <option>Medio tiempo (tardes)</option><option>Fines de semana</option>
+              <option>Por servicios / Freelance</option><option>Turnos nocturnos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Años de experiencia</label>
+            <select>
+              <option value="">Tu experiencia</option>
+              <option>Recién graduado (0 – 1 año)</option><option>1 – 3 años</option>
+              <option>3 – 5 años</option><option>Más de 5 años</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>¿Tienes experiencia en salud domiciliaria?</label>
+          <select>
+            <option value="">Selecciona una opción</option>
+            <option>Sí, tengo experiencia domiciliaria</option>
+            <option>No, pero me interesa aprender</option>
+            <option>Tengo experiencia en UCI / hospitalaria</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cuéntanos sobre ti</label>
+          <textarea placeholder="Describe tu experiencia, habilidades y por qué quieres hacer parte de SALUDOMI IPS..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Adjuntar hoja de vida</label>
+          <div class="file-drop" onclick="document.getElementById('cvFile').click()">
+            <input type="file" id="cvFile" accept=".pdf,.doc,.docx" style="display:none" onchange="showFileName(this)">
+            <span class="file-icon"><i class="fa-solid fa-file-lines"></i></span>
+            <span id="fileLabel">Haz clic para subir tu CV<br><small style="color:var(--gris);font-size:0.75rem;">PDF, DOC o DOCX · Máx. 5 MB</small></span>
+          </div>
+        </div>
+        <button class="btn-submit" onclick="submitPostulacion()"><i class="fa-solid fa-rocket"></i> Enviar Postulación</button>
+        <p style="font-size:0.75rem;color:var(--gris);margin-top:1rem;text-align:center;">
+          Datos tratados conforme a la <a href="#" style="color:var(--azul-claro);">Política de Privacidad</a> y la Ley 1581 de 2012.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COBERTURA -->
+<section id="cobertura">
+  <div class="max-w">
+    <div class="reveal">
+      <span class="section-label">Zona de Cobertura</span>
+      <h2 class="section-title">Atendemos en Arauca<br>y sus municipios</h2>
+      <p class="section-desc">Prestamos servicios en todo el departamento de Arauca. Contáctanos para confirmar disponibilidad en tu zona.</p>
+      <div class="cobertura-grid">
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Arauca (Capital)</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Arauquita</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Saravena</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Tame</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Fortul</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Puerto Rondón</div>
+        <div class="zona-chip"><i class="fa-solid fa-location-dot"></i> Cravo Norte</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="max-w contacto-grid">
+    <div class="contact-info reveal">
+      <span class="section-label">Contáctanos</span>
+      <h3>¿Necesitas atención médica en casa?</h3>
+      <p>Comunícate con nosotros y con gusto te orientamos sobre el servicio más adecuado para tu caso. Respondemos en menos de 30 minutos.</p>
+      <div class="contact-items">
+        <div class="contact-item">
+          <div class="ci-icon"><i class="fa-solid fa-phone"></i></div>
+          <div><p>Teléfono / WhatsApp</p><strong>+57 310 619 4223</strong></div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div><p>Correo electrónico</p><strong>saludomigeneral01@gmail.com</strong></div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div><p>Ciudad principal</p><strong>Arauca, Departamento de Arauca</strong></div>
+        </div>
+        <div class="contact-item">
+          <div class="ci-icon"><i class="fa-solid fa-clock"></i></div>
+          <div><p>Horario de oficina</p><strong>Lun – Sáb: 7am – 7pm · Urgencias 24/7</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card reveal">
+      <h3>Solicitar una visita médica</h3>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" placeholder="Tu nombre"></div>
+        <div class="form-group"><label>Apellido</label><input type="text" placeholder="Tu apellido"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Teléfono / WhatsApp</label><input type="tel" placeholder="+57 310 000 0000"></div>
+        <div class="form-group"><label>Correo electrónico</label><input type="email" placeholder="tu@email.com"></div>
+      </div>
+      <div class="form-group">
+        <label>EPS / Aseguradora</label>
+        <select>
+          <option value="">Selecciona tu EPS</option>
+          <option>Coosalud</option><option>Nueva EPS</option><option>Sura EPS</option>
+          <option>Compensar</option><option>Sanitas</option><option>Medimás</option>
+          <option>Particular / Prepagada</option><option>Otra</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Servicio requerido</label>
+        <select>
+          <option value="">¿Qué servicio necesitas?</option>
+          <option>Visita Médica Domiciliaria</option><option>Enfermería Profesional</option>
+          <option>Laboratorio a Domicilio</option><option>Fisioterapia y Rehabilitación</option>
+          <option>Infusión de Medicamentos IV</option><option>Atención Paliativa</option>
+          <option>Cuidado del Adulto Mayor</option><option>Nutrición Clínica</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Municipio</label>
+        <select>
+          <option value="">¿En qué municipio estás?</option>
+          <option>Arauca (Capital)</option><option>Arauquita</option><option>Saravena</option>
+          <option>Tame</option><option>Fortul</option><option>Puerto Rondón</option><option>Cravo Norte</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Describe brevemente el caso</label>
+        <textarea placeholder="Cuéntanos sobre el paciente y su situación de salud para orientarte mejor..."></textarea>
+      </div>
+      <button class="btn-submit" onclick="submitForm()"><i class="fa-solid fa-clipboard-list"></i> Solicitar Visita</button>
+      <p style="font-size:0.75rem;color:var(--gris);margin-top:1rem;text-align:center;">
+        Al enviar aceptas nuestra <a href="#" style="color:var(--azul-claro);">Política de Privacidad</a>. Tu información es confidencial y segura.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="max-w">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <div>
+            <div class="nombre">SALUDOMI IPS</div>
+            <div class="sub">Salud Domiciliaria</div>
+          </div>
+        </div>
+        <p>IPS habilitada por el Ministerio de Salud y Protección Social de Colombia. Comprometidos con la salud y el bienestar de las familias de Arauca.</p>
+        <div class="social-links">
+          <a href="#" title="Facebook">f</a>
+          <a href="#" title="Instagram">ig</a>
+          <a href="https://wa.me/573106194223" title="WhatsApp" target="_blank">wa</a>
+          <a href="mailto:saludomigeneral01@gmail.com" title="Email">@</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="#servicios">Visita Médica</a></li>
+          <li><a href="#servicios">Enfermería</a></li>
+          <li><a href="#servicios">Fisioterapia</a></li>
+          <li><a href="#servicios">Laboratorio</a></li>
+          <li><a href="#servicios">Cuidado Paliativo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <ul>
+          <li><a href="#nosotros">Sobre nosotros</a></li>
+          <li><a href="#trabaja">Trabaja con nosotros</a></li>
+          <li><a href="#">Habilitación MSPS</a></li>
+          <li><a href="#">Resolución de queja</a></li>
+          <li><a href="#">PQRS</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal y Calidad</h4>
+        <ul>
+          <li><a href="#">Políticas de privacidad</a></li>
+          <li><a href="#">Tratamiento de datos</a></li>
+          <li><a href="#">Derechos del paciente</a></li>
+          <li><a href="#">Consentimientos</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 SALUDOMI IPS. Todos los derechos reservados · Arauca, Colombia</p>
+      <div class="certifications">
+        <div class="cert-badge"><i class="fa-solid fa-check"></i> Habilitada MSPS</div>
+        <div class="cert-badge"><i class="fa-solid fa-shield-halved"></i> Datos seguros</div>
+        <div class="cert-badge"><i class="fa-solid fa-location-dot"></i> Arauca</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a href="https://wa.me/573106194223" class="whatsapp-fab" target="_blank">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" viewBox="0 0 24 24">
+    <path d="M20.52 3.48A11.94 11.94 0 0 0 12 .01C5.37.01 0 5.38 0 12c0 2.12.55 4.19 1.6 6.02L0 24l6.17-1.62A11.93 11.93 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.21-3.48-8.52zm-8.52 18.2c-1.89 0-3.73-.51-5.33-1.48l-.38-.23-3.66.96.98-3.57-.25-.37A9.89 9.89 0 0 1 2.1 12c0-5.46 4.44-9.9 9.9-9.9 2.64 0 5.12 1.03 6.99 2.91A9.82 9.82 0 0 1 21.9 12c0 5.46-4.44 9.9-9.9 9.9zm5.4-7.42c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.96 1.18-.18.2-.35.23-.65.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.74-1.64-2.04-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.68-1.64-.93-2.24-.24-.6-.49-.52-.68-.53-.18-.01-.38-.01-.58-.01-.2 0-.53.08-.8.38-.27.3-1.05 1.03-1.05 2.52 0 1.49 1.08 2.93 1.23 3.13.15.2 2.12 3.23 5.14 4.53.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.44.25-.71.25-1.32.18-1.44-.07-.12-.28-.2-.58-.35z"/>
+  </svg>
+</a>
+
+<script>
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Mobile menu
+  function toggleMenu() {
+    const links = document.querySelector('.nav-links');
+    const open = links.style.display === 'flex';
+    links.style.display = open ? 'none' : 'flex';
+    if (!open) {
+      Object.assign(links.style, {
+        flexDirection:'column', position:'absolute', top:'72px', left:'0',
+        width:'100%', background:'white', padding:'1.2rem 5%',
+        borderBottom:'1px solid rgba(26,107,175,0.1)', zIndex:'999',
+        boxShadow:'0 8px 30px rgba(0,0,0,0.1)'
+      });
+    }
+  }
+
+  // File upload name
+  function showFileName(input) {
+    const label = document.getElementById('fileLabel');
+    if (input.files && input.files[0]) {
+      label.innerHTML = '<i class="fa-solid fa-check"></i> ' + input.files[0].name;
+      label.style.color = 'var(--azul)';
+    }
+  }
+
+  // Form feedback
+  function submitForm() {
+    const btn = document.querySelector('#contacto .btn-submit');
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Solicitud enviada! Te contactaremos pronto';
+    btn.style.background = 'var(--azul-oscuro)';
+    setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-clipboard-list"></i> Solicitar Visita'; btn.style.background = ''; }, 4500);
+  }
+
+  function submitPostulacion() {
+    const btn = document.querySelector('#trabaja .btn-submit');
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Postulación enviada! Revisaremos tu perfil';
+    btn.style.background = 'var(--azul-oscuro)';
+    setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-rocket"></i> Enviar Postulación'; btn.style.background = ''; }, 4500);
+  }
+</script>
+</body>
+</html>
